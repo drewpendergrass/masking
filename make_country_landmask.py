@@ -255,6 +255,6 @@ elif file_out.split('.')[-1].lower() in ["nc","nc4"]:
 			"End_Time":"0"
 		}
 	)
-	ds.to_netcdf(outfile)
+	ds.to_netcdf(file_out)
 
 
