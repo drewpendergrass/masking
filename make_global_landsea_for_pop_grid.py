@@ -56,7 +56,7 @@ for latval, lonval in zip(lat2, lon2):
 	maskadd = 0
 	for geom in geoms:
 		cs = geom.contains(this_point)
-		if (len(cs) > 0) and cs.values[0]:
+		if cs:
 			maskadd = 1
 			break
 	mask.append(maskadd)
