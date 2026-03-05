@@ -3,7 +3,7 @@
 #ex (Korea): python make_country_landmask.py -grid AS_MERRA2 -country KOR -o /n/holylfs05/LABS/jacob_lab/Users/drewpendergrass/korea_comp_data/GC/korea_mask.npy
 #ex (NO2 ratio masks): python make_country_landmask.py -grid '/n/holylfs05/LABS/jacob_lab/Users/drewpendergrass/korea_comp_data/sat/monthly_hcho_no2_ratio.nc' -country KOR -o "/n/holylfs05/LABS/jacob_lab/Users/drewpendergrass/korea_comp_data/sat/no2_satratio_mask.npy"
 #ex population masks: python make_country_landmask.py -grid '0.5x0.5' -aggByPop True -continent "South America" -country "FRA" -lon "m180,m30" -custom "SUBREGION:Caribbean,Central America" -o /hpc/group/shindell/ap851/masks/south_and_central_america_0p5x0p5_pop_weighted_mask.nc4
-
+#ex population masks, south korea test: python make_country_landmask.py -grid '0.5x0.5' -aggByPop True -country "KOR" -lon "123,132" -lat "32,40" -o /hpc/group/shindell/ap851/masks/skorea_0p5x0p5_pop_weighted_mask.npy
 
 import geopandas as gpd
 import numpy as np
@@ -29,12 +29,14 @@ if testing:
 	grid2Agg = None
 	aggByPop = False
 	path2pop=None
+	path2poplandmask=None
 else:
 	parser = argparse.ArgumentParser(description='Make mask for a given country.')
 	parser.add_argument('-grid', '--grid_label', type=str, help='Label of GEOS-Chem grid (e.g. AS_MERRA2, 2.0x2.5), or a netcdf file with latitude/longitude as dimensions (will make mask with same dimensions). Curvilinear is fine.')
 	parser.add_argument('-grid2Agg', '--grid_label_for_agg', default=None, type=str, help='If supplied, will aggregate the grid above to this resolution by area; mask will then represent percent of grid cell in boundary.')
 	parser.add_argument('-aggByPop', '--grid_percent_by_population', default=False, type=str2bool, help='If True, will aggregate to the grid_label resolution, with boundary cells weighted between 0 and 1 by population; mask will then represent percent of grid cell in boundary weighted by population.')
 	parser.add_argument('-path2pop', '--path_to_population_gpw4_file', default="/hpc/group/shindell/ap851/masks/gpwv4/gpw_v4_une_atotpopbt_cntm_2pt5_min.nc", type=str, help='If aggByPop is True, use this file of total population counts from GPWv4 at 2.5 arcmin to calculate population weights.')
+	parser.add_argument('-path2poplandmask', '--path_to_population_gpw4_landmask_file', default="/hpc/group/shindell/ap851/masks/gpwv4/gpw_landmask.nc", type=str, help='If aggByPop is True, use this file of to apply a landmaks for the population counts to avoid coastline errors.')
 	parser.add_argument('-latlon_name', '--latlon_name', type=str, default="lat lon", help='If grid supplied is a netcdf file, name of latitude/longitude dimensions respectively, space delimited. Example: "lat lon".')
 	parser.add_argument('-country', '--country', type=str, default='', help='Three letter ISO code for country to make mask of. If multiple, comma separated. Use tilde to exclude a country. To only get country north of a latitude value, use colon and then that value (e.g. USA:50,CAN,~MEX)')
 	parser.add_argument('-continent', '--continent', type=str, default='', help='Continent to make mask of. Countries can be appended if present')
@@ -48,6 +50,7 @@ else:
 	grid2Agg = args.grid_label_for_agg
 	aggByPop=args.grid_percent_by_population
 	path2pop=args.path_to_population_gpw4_file
+	path2poplandmask=args.path_to_population_gpw4_landmask_file
 	countrystring=args.country
 	custom_grouping=args.custom_grouping
 	continent = args.continent
@@ -147,10 +150,13 @@ if grid2Agg is not None:
 	coarse_lon,coarse_lat = getLonLatFromLabel(grid2Agg)
 elif aggByPop:
 	popdata = xr.open_dataset(path2pop)
+	poplandmask = xr.open_dataset(path2poplandmask)
 	popdata = popdata.fillna(0)
 	popdata = popdata.sortby("latitude", ascending=True) #fix lat dimension
 	#Select 2020 data
 	popdata = popdata['UN-Adjusted Population Count, v4.10 (2000, 2005, 2010, 2015, 2020): 2.5 arc-minutes'].sel(raster=5)
+	#Apply pop landmask to avoid coast problems
+	popdata = popdata*poplandmask['mask']
 	coarse_lon_edge,coarse_lat_edge = getLonLatEdgeFromLabel(gridlabel)
 	coarse_lon,coarse_lat = getLonLatFromLabel(gridlabel)
 	lon = popdata.longitude.values
