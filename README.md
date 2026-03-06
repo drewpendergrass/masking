@@ -1,9 +1,10 @@
-# Masking tools for any country/countries or regions of the world, at whatever resolution
+# Make a gridded mask for any country/countries or regions of the world, at whatever resolution
 Command line Python tools to generate gridded country and region masks at any resolution. This includes (1) binary masks, (2) percent weighted by area of gridcell in country/region of interest, (3) percent weighted by population of gridcell in country/region of interest.
 
 Here’s how the code works:
 * Install a Python conda environment using the geopandas.yml file. 
-* You can then run python at the command line to generate pretty much any mask you can imagine. A few examples below:
+* You can then run python at the command line to generate pretty much any mask you can imagine. A few examples are below.
+* You supply a save file name in your command line call. If your file ends in .csv, it will save as csv. If .npy, an npy file. If .nc or .nc4, a netcdf file with latitude and longitude included.
 
 This run will generate a mask at 2x2.5 degrees that has values of 1 for all grid cells in the World Bank Middle East and North Africa region, plus Mongolia (ISO3 code):
 
@@ -12,8 +13,6 @@ python make_country_landmask.py -grid "2.0x2.5" -custom "REGION_WB:Middle East &
 This will generate a mask of Europe, cut off a bit west of Russia:
 
 python make_country_landmask.py -grid "2.0x2.5" -continent Europe -lat '33,72' -lon 'm26,37' -o Europe_no_russia.npy
-
-If your outfile ends in .csv, it will save as csv. If .npy, an npy file. If .nc or .nc4, a netcdf file
 
 ## Making masks for regions, capturing coastline percentages, and using curvilinear grids
 
