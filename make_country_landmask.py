@@ -151,6 +151,7 @@ if grid2Agg is not None:
 elif aggByPop:
 	popdata = xr.open_dataset(path2pop)
 	poplandmask = xr.open_dataset(path2poplandmask)
+	poplandmask = poplandmask.rename({'lat':'latitude','lon':'longitude'})
 	popdata = popdata.fillna(0)
 	popdata = popdata.sortby("latitude", ascending=True) #fix lat dimension
 	#Select 2020 data
