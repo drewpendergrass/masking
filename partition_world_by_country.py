@@ -16,9 +16,9 @@ debugMode = False
 if testing:
 	file_out = '/hpc/group/shindell/ap851/mask_test.nc'
 	gridlabel = "4.0x5.0"
-	countrystring=""
+	countrystring="USA,CAN,KOR"
 	latlon_name = "lat lon"
-	grid2Agg = "USA,CAN,KOR"
+	grid2Agg = None
 else:
 	parser = argparse.ArgumentParser(description='Make mask for a given country.')
 	parser.add_argument('-grid', '--grid_label', type=str, help='Label of GEOS-Chem grid (e.g. AS_MERRA2, 2.0x2.5), or a netcdf file with latitude/longitude as dimensions (will make mask with same dimensions). Curvilinear is fine.')
