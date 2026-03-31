@@ -12,7 +12,7 @@ from datetime import datetime
 from simple_utils import *
 
 testing = False
-debugMode = False
+debugMode = True
 
 if testing:
 	file_out = '/hpc/group/shindell/ap851/mask_test.nc'
@@ -89,7 +89,7 @@ if grid2Agg is not None:
 		np.save(f'{file_out}_fine_onegrid',mask)
 		np.save(f'{file_out}_fine_multidim',to_return)
 	coarse_lon2d, coarse_lat2d = np.meshgrid(coarse_lon,coarse_lat)
-	mask2return = np.zeros(to_return.shape)
+	mask2return = np.zeros((len(countries),len(coarse_lat),len(coarse_lon)))
 	for i in range(len(coarse_lon)):
 		lonstart,lonstop = coarse_lon_edge[i:i+2]
 		if lonstart<lonstop: # normal case

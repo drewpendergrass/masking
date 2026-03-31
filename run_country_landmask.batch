@@ -11,4 +11,5 @@
 source /work/ap851/CHEEREIO/IASI_full_v03_19a_BACKUP/CHEEREIO/environments/cheereio.env #This is specific to the Harvard cluster; rewrite for yours
 eval "$(conda shell.bash hook)"
 
-conda run -n geopandas python make_country_landmask.py -grid '0.5x0.5' -aggByPop True -country USA -lat '24,50' -lon "m128,m65" -o /hpc/group/shindell/ap851/masks/conus_0p5x0p5_pop_weighted_mask.nc4
+#conda run -n geopandas python make_country_landmask.py -grid '0.5x0.5' -aggByPop True -country USA -lat '24,50' -lon "m128,m65" -o /hpc/group/shindell/ap851/masks/conus_0p5x0p5_pop_weighted_mask.nc4
+conda run -n geopandas python partition_world_by_country.py -grid '2.0x2.5' -grid2Agg '4.0x5.0' -o '/hpc/group/shindell/ap851/masks/partition.nc'
