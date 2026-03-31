@@ -10,7 +10,7 @@ import xarray as xr
 from datetime import datetime
 from simple_utils import *
 
-testing = False
+testing = True
 debugMode = False
 
 if testing:
