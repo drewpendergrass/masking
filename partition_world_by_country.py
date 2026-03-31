@@ -34,7 +34,7 @@ else:
 	latlon_name = args.latlon_name
 
 countries = countrystring.split(',')
-countrieswcode = {t:i for i,t in enumerate(test)}
+countrieswcode = {c:i for i,c in enumerate(countries)}
 
 world=gpd.read_file('WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp')
 geoms = {country:world[world['ISO_A3'] == country].geometry for country in countries}
