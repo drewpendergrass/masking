@@ -80,7 +80,7 @@ for latval, lonval in zip(lat2, lon2):
 mask = np.array(mask).reshape(lon2d.shape)
 to_return = np.zeros((len(countries),mask.shape[0],mask.shape[1]))
 for country in countries:
-	to_return[countrieswcode[country],:,:] = mask==countrieswcode[country]
+	to_return[countrieswcode[country]-1,:,:] = mask==countrieswcode[country] #Subtract 1 to 0 index
 
 
 if grid2Agg is not None:
@@ -100,9 +100,9 @@ if grid2Agg is not None:
 			validlat = (lat2d>=latstart)&(lat2d<latstop)
 			valid = validlon&validlat
 			for country in countries:
-				temp = to_return[countrieswcode[country],:,:]
+				temp = to_return[countrieswcode[country]-1,:,:]
 				percent = np.sum(temp[valid])/np.sum(valid)
-				mask2return[countrieswcode[country],j,i] = percent
+				mask2return[countrieswcode[country]-1,j,i] = percent
 	to_return = mask2return
 
 if grid2Agg is not None:
