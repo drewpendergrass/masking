@@ -1,5 +1,6 @@
 #Use Geopandas environment
 #Makes a single netcdf with masks for different countries given on a country dimension with ISO3 tags
+#python partition_world_by_country.py -grid '1x1' -grid2Agg '4.0x5.0' -o '/hpc/group/shindell/ap851/masks/partition.nc'
 
 import geopandas as gpd
 import numpy as np
@@ -10,13 +11,13 @@ import xarray as xr
 from datetime import datetime
 from simple_utils import *
 
-testing = True
+testing = False
 debugMode = False
 
 if testing:
 	file_out = '/hpc/group/shindell/ap851/mask_test.nc'
 	gridlabel = "4.0x5.0"
-	countrystring="USA,CAN,KOR"
+	countrystring="USA,CAN,JPN,CHN"
 	latlon_name = "lat lon"
 	grid2Agg = None
 else:
@@ -24,7 +25,7 @@ else:
 	parser.add_argument('-grid', '--grid_label', type=str, help='Label of GEOS-Chem grid (e.g. AS_MERRA2, 2.0x2.5), or a netcdf file with latitude/longitude as dimensions (will make mask with same dimensions). Curvilinear is fine.')
 	parser.add_argument('-grid2Agg', '--grid_label_for_agg', default=None, type=str, help='If supplied, will aggregate the grid above to this resolution by area; mask will then represent percent of grid cell in boundary.')
 	parser.add_argument('-latlon_name', '--latlon_name', type=str, default="lat lon", help='If grid supplied is a netcdf file, name of latitude/longitude dimensions respectively, space delimited. Example: "lat lon".')
-	parser.add_argument('-country', '--country', type=str, default='', help='Comma separated three letter ISO codes for countries to make masks of. Each country will be placed in the country dimension')
+	parser.add_argument('-country', '--country', type=str, default='ABW,AFG,AGO,AIA,ALB,AND,ARE,ARG,ARM,ASM,ATF,ATG,AUS,AUT,AZE,BDI,BEL,BEN,BFA,BGD,BGR,BHR,BHS,BIH,BLM,BLR,BLZ,BMU,BOL,BRA,BRB,BRN,BTN,BWA,CAF,CAN,CHE,CHL,CHN,CIV,CMR,COD,COG,COK,COL,COM,CPV,CRI,CUB,CUW,CYM,CYP,CZE,DEU,DJI,DMA,DNK,DOM,DZA,ECU,EGY,ERI,ESP,EST,ETH,FIN,FJI,FLK,FRO,FSM,GAB,GBR,GEO,GGY,GHA,GIB,GIN,GMB,GNB,GNQ,GRC,GRD,GRL,GTM,GUM,GUY,HKG,HMD,HND,HRV,HTI,HUN,IDN,IMN,IND,IOT,IRL,IRN,IRQ,ISL,ISR,ITA,JAM,JEY,JOR,JPN,KAZ,KEN,KGZ,KHM,KIR,KNA,KOR,KWT,LAO,LBN,LBR,LBY,LCA,LIE,LKA,LSO,LTU,LUX,LVA,MAC,MAF,MAR,MCO,MDA,MDG,MDV,MEX,MHL,MKD,MLI,MLT,MMR,MNE,MNG,MNP,MOZ,MRT,MSR,MUS,MWI,MYS,NAM,NCL,NER,NFK,NGA,NIC,NIU,NLD,NPL,NRU,NZL,OMN,PAK,PAN,PCN,PER,PHL,PLW,PNG,POL,PRI,PRK,PRT,PRY,PSE,PYF,QAT,ROU,RUS,RWA,SAU,SDN,SEN,SGP,SGS,SHN,SLB,SLE,SLV,SMR,SOM,SPM,SRB,SSD,STP,SUR,SVK,SVN,SWE,SWZ,SXM,SYC,SYR,TCA,TCD,TGO,THA,TJK,TKM,TLS,TON,TTO,TUN,TUR,TUV,TZA,UGA,UKR,UMI,URY,USA,UZB,VAT,VCT,VEN,VGB,VIR,VNM,VUT,WLF,WSM,YEM,ZAF,ZMB,ZWE', help='Comma separated three letter ISO codes for countries to make masks of. Each country will be placed in the country dimension')
 	parser.add_argument('-o', '--file_out', type=str, help='Where to save mask as netcdf.')
 	args = parser.parse_args()
 	file_out = args.file_out
