@@ -34,7 +34,7 @@ else:
 	latlon_name = args.latlon_name
 
 countries = countrystring.split(',')
-countrieswcode = {c:i for i,c in enumerate(countries)}
+countrieswcode = {c:i+1 for i,c in enumerate(countries)}
 
 world=gpd.read_file('WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp')
 geoms = {country:world[world['ISO_A3'] == country].geometry for country in countries}
@@ -67,11 +67,15 @@ mask = []
 # check for containment within the specified geometry.
 for latval, lonval in zip(lat2, lon2):
 	this_point = Point(lonval, latval)
+	to_add = 0
 	for country in countries:
 		cs = geoms[country].contains(this_point)
 		if (len(cs) > 0) and cs.values[0]:
-			mask.append(countrieswcode[country])
+			to_add = countrieswcode[country]
 			break
+	mask.append(to_add)
+
+
 
 mask = np.array(mask).reshape(lon2d.shape)
 to_return = np.zeros((len(countries),mask.shape[0],mask.shape[1]))
