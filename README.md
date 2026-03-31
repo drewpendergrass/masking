@@ -44,3 +44,12 @@ The idea here is that you capture what percent of a given gridcell belongs to yo
 
 This feature requires external data. If you want to use the population-weighted feature, you'll need to download the 2.5 arcminute Gridded Population of the World v4 dataset (hosted by NASA EarthData) and supply a path to it. You'll also need a land-sea mask at the 2.5 arcminute grid. While the repository does provide you the code to generate this, you can also download a pre-generated mask from the release tab of this repository.
 
+## Make a single NetCDF file with different country masks along a country dimension.
+
+You can make a NetCDF file with country masks along a 'country' using a command like the following:
+
+```bash
+python partition_world_by_country.py -grid '0.5x0.5' -grid2Agg '4.0x5.0' -o '/hpc/group/shindell/ap851/masks/partition.nc' -country 'DZA,ECU,EGY,ERI,ESP,EST,ETH,FIN'
+```
+
+This will make a netcdf file with a "country" dimension (and lat,lon), with values corresponding to each input country. The values of the mask vary from 0 to 1, capturing the fraction of the grid cell occupied by the country of interest.
