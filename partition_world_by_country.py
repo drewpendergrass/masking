@@ -138,7 +138,7 @@ else:
 	#We've already done the parallelization, and now are just completing everything
 	mask_parts = []
 	for i in range(parallelization_n_tasks):
-		mask_parts.append(np.load(f'{file_out}_parworker_{i}'))
+		mask_parts.append(np.load(f'{file_out}_parworker_{i}.npy'))
 	mask = np.concatenate(mask_parts)
 
 if do_par and step1:
