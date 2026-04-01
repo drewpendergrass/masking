@@ -180,7 +180,7 @@ else:
 					mask2return[countrieswcode[country]-1,j,i] = percent
 		to_return = mask2return
 
-	if grid2Agg is not None:
+	if (grid2Agg is not None) or aggByPop:
 		lon2save = coarse_lon
 		lat2save = coarse_lat
 	else:
