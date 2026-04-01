@@ -16,7 +16,7 @@ from datetime import datetime
 from simple_utils import *
 
 testing = False
-debugMode = True
+debugMode = False
 
 if testing:
 	file_out = '/hpc/group/shindell/ap851/mask_test.nc'
