@@ -3,7 +3,8 @@
 #python partition_world_by_country.py -grid '1x1' -grid2Agg '4.0x5.0' -o '/hpc/group/shindell/ap851/masks/partition.nc'
 #To partition by population, use (parallelization example)
 #python partition_world_by_country.py -grid '4.0x5.0' -aggByPop 'True' -c 0 -n 10000 -country 'USA,CAN,JPN,CHN' -o '/hpc/group/shindell/ap851/masks/partition_by_pop.nc'
-
+#To merge the 100 group from the sbatch file use,
+#python partition_world_by_country.py -grid '4.0x5.0' -aggByPop 'True' -n 100 -o '/hpc/group/shindell/ap851/masks/partition_by_pop.nc'
 
 import geopandas as gpd
 import numpy as np
