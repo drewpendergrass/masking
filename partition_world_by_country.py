@@ -76,8 +76,8 @@ countrieswcode = {c:i+1 for i,c in enumerate(countries)}
 world=gpd.read_file('WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp')
 geoms = {}
 for country in countries:
-	#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
-	if country in ['NOR','FRA','KSV','NZL','TKL']:
+	#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish, Netherlands also gets mixed up with territories.
+	if country in ['NOR','FRA','KSV','NZL','TKL', 'NLD']:
 		geoms[country] = world[world['WB_A3'] == country].geometry
 	else:
 		geoms[country] = world[world['ISO_A3'] == country].geometry

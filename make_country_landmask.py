@@ -101,15 +101,15 @@ if len(custom_grouping)>0:
 
 if len(countries)>0:
 	for c in countries:
-		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
-		if c in ['NOR','FRA','KSV','NZL','TKL']:
+		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish, same with the Netherlands.
+		if c in ['NOR','FRA','KSV','NZL','TKL','NLD']:
 			geoms.extend([world[world['WB_A3'] == c].geometry])
 		else:
 			geoms.extend([world[world['ISO_A3'] == c].geometry])
 if len(excl_countries)>0:
 	for c in excl_countries:
-		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
-		if c in ['NOR','FRA','KSV','NZL','TKL']:
+		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish, same with the Netherlands.
+		if c in ['NOR','FRA','KSV','NZL','TKL','NLD']:
 			excl_geoms.extend([world[world['WB_A3'] == c].geometry])
 		else:
 			excl_geoms.extend([world[world['ISO_A3'] == c].geometry])
@@ -118,8 +118,8 @@ if len(countries_north)>0:
 	north_shapemask=True
 	for c in countries_north:
 		north_geoms[c] = {}
-		if (c=='NOR') or (c=='FRA') or (c=='KSV') or (c=='NZL') or (c=='TKL'):
-			#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
+		if (c=='NOR') or (c=='FRA') or (c=='KSV') or (c=='NZL') or (c=='TKL') or (c=='NLD'):
+			#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish, same with the Netherlands.
 			north_geoms[c]['geom'] = world[world['WB_A3'] == c].geometry
 		else:
 			north_geoms[c]['geom'] = world[world['ISO_A3'] == c].geometry
