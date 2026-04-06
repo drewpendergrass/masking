@@ -29,6 +29,7 @@ if testing:
 	path2poplandmask=None
 	parallelization_code = None
 	parallelization_n_tasks = None
+	par_combine = None
 else:
 	parser = argparse.ArgumentParser(description='Make mask for a given country.')
 	parser.add_argument('-grid', '--grid_label', type=str, help='Label of GEOS-Chem grid (e.g. AS_MERRA2, 2.0x2.5), or a netcdf file with latitude/longitude as dimensions (will make mask with same dimensions). Curvilinear is fine.')
@@ -39,6 +40,7 @@ else:
 	parser.add_argument('-latlon_name', '--latlon_name', type=str, default="lat lon", help='If grid supplied is a netcdf file, name of latitude/longitude dimensions respectively, space delimited. Example: "lat lon".')
 	parser.add_argument('-c', '--parallelization_code', type=int, default=None, help='If parallelizing and in step one (generating high-res mask), code for this worker portion of the task. If left as none but parallelizing, assumes we are in step 2')
 	parser.add_argument('-n', '--parallelization_n_tasks', type=int, default=None, help='If parallelizing, number of workers. If a value is supplied here, we assume that parallization is happening.')
+	parser.add_argument('-par_combine', '--par_combine', type=int, default=None, help='If parallelizing, set this setting to not None to also parallelize the merge calculation along longitude. The value will be the index of longitude calculated.')
 	parser.add_argument('-country', '--country', type=str, default='ABW,AFG,AGO,AIA,ALB,AND,ARE,ARG,ARM,ASM,ATF,ATG,AUS,AUT,AZE,BDI,BEL,BEN,BFA,BGD,BGR,BHR,BHS,BIH,BLM,BLR,BLZ,BMU,BOL,BRA,BRB,BRN,BTN,BWA,CAF,CAN,CHE,CHL,CHN,CIV,CMR,COD,COG,COK,COL,COM,CPV,CRI,CUB,CUW,CYM,CYP,CZE,DEU,DJI,DMA,DNK,DOM,DZA,ECU,EGY,ERI,ESP,EST,ETH,FIN,FJI,FLK,FRA,FRO,FSM,GAB,GBR,GEO,GGY,GHA,GIB,GIN,GMB,GNB,GNQ,GRC,GRD,GRL,GTM,GUM,GUY,HKG,HMD,HND,HRV,HTI,HUN,IDN,IMN,IND,IOT,IRL,IRN,IRQ,ISL,ISR,ITA,JAM,JEY,JOR,JPN,KAZ,KEN,KGZ,KHM,KIR,KNA,KOR,KSV,KWT,LAO,LBN,LBR,LBY,LCA,LIE,LKA,LSO,LTU,LUX,LVA,MAC,MAF,MAR,MCO,MDA,MDG,MDV,MEX,MHL,MKD,MLI,MLT,MMR,MNE,MNG,MNP,MOZ,MRT,MSR,MUS,MWI,MYS,NAM,NCL,NER,NFK,NGA,NIC,NIU,NLD,NOR,NPL,NRU,NZL,OMN,PAK,PAN,PCN,PER,PHL,PLW,PNG,POL,PRI,PRK,PRT,PRY,PSE,PYF,QAT,ROU,RUS,RWA,SAU,SDN,SEN,SGP,SGS,SHN,SLB,SLE,SLV,SMR,SOM,SPM,SRB,SSD,STP,SUR,SVK,SVN,SWE,SWZ,SXM,SYC,SYR,TCA,TCD,TGO,THA,TJK,TKM,TLS,TON,TTO,TUN,TUR,TUV,TZA,UGA,UKR,UMI,URY,USA,UZB,VAT,VCT,VEN,VGB,VIR,VNM,VUT,WLF,WSM,YEM,ZAF,ZMB,ZWE', help='Comma separated three letter ISO codes for countries to make masks of. Each country will be placed in the country dimension')
 	parser.add_argument('-o', '--file_out', type=str, help='Where to save mask as netcdf.')
 	args = parser.parse_args()
@@ -52,6 +54,7 @@ else:
 	latlon_name = args.latlon_name
 	parallelization_code = args.parallelization_code
 	parallelization_n_tasks = args.parallelization_n_tasks
+	par_combine = args.par_combine
 
 
 if (grid2Agg is not None) and aggByPop:
@@ -164,6 +167,9 @@ else:
 		coarse_lon2d, coarse_lat2d = np.meshgrid(coarse_lon,coarse_lat)
 		mask2return = np.zeros((len(countries),len(coarse_lat),len(coarse_lon)))
 		for i in range(len(coarse_lon)):
+			if par_combine is not None:
+				if i != par_combine:
+					continue #jump to right point
 			lonstart,lonstop = coarse_lon_edge[i:i+2]
 			if lonstart<lonstop: # normal case
 				validlon = (lon2d>=lonstart)&(lon2d<lonstop)
@@ -212,6 +218,9 @@ else:
 			"End_Time":"0"
 		}
 	)
-	ds.to_netcdf(file_out)
+	if par_combine is not None:
+		ds.to_netcdf(f'{file_out}_mergepar_{par_combine}.nc')
+	else:
+		ds.to_netcdf(file_out)
 
 
