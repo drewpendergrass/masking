@@ -100,17 +100,29 @@ if len(custom_grouping)>0:
 	geoms.extend([world[world['OBJECTID'] == i].geometry for i in ids])
 
 if len(countries)>0:
-	geoms.extend([world[world['ISO_A3'] == country].geometry for country in countries])
-
+	for c in countries:
+		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
+		if c in ['NOR','FRA','KSV','NZL','TKL']:
+			geoms.extend([world[world['WB_A3'] == c].geometry])
+		else:
+			geoms.extend([world[world['ISO_A3'] == c].geometry])
 if len(excl_countries)>0:
-	excl_geoms.extend([world[world['ISO_A3'] == country].geometry for country in excl_countries])
+	for c in excl_countries:
+		#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
+		if c in ['NOR','FRA','KSV','NZL','TKL']:
+			excl_geoms.extend([world[world['WB_A3'] == c].geometry])
+		else:
+			excl_geoms.extend([world[world['ISO_A3'] == c].geometry])
 	excl_shapemask=True
-
 if len(countries_north)>0:
 	north_shapemask=True
 	for c in countries_north:
 		north_geoms[c] = {}
-		north_geoms[c]['geom'] = world[world['ISO_A3'] == c].geometry
+		if (c=='NOR') or (c=='FRA') or (c=='KSV') or (c=='NZL') or (c=='TKL'):
+			#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
+			north_geoms[c]['geom'] = world[world['WB_A3'] == c].geometry
+		else:
+			north_geoms[c]['geom'] = world[world['ISO_A3'] == c].geometry
 		north_geoms[c]['lat'] = countries_north[c]
 
 if (len(geoms)==0) and (len(north_geoms)==0):

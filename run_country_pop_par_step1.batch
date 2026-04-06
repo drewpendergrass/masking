@@ -7,9 +7,9 @@
 #SBATCH -p nsoeclimate,scavenger
 #SBATCH --mem=8000
 #SBATCH --mail-type=END
-#SBATCH --array=0-99
+#SBATCH --array=0-499
 
 source /work/ap851/CHEEREIO/IASI_full_v03_19a_BACKUP/CHEEREIO/environments/cheereio.env #This is specific to the Harvard cluster; rewrite for yours
 eval "$(conda shell.bash hook)"
 
-conda run -n geopandas python partition_world_by_country.py -grid '4.0x5.0' -aggByPop 'True' -c $SLURM_ARRAY_TASK_ID -n 100 -o '/hpc/group/shindell/ap851/masks/partition_by_pop.nc'
+conda run -n geopandas python partition_world_by_country.py -grid '4.0x5.0' -aggByPop 'True' -c $SLURM_ARRAY_TASK_ID -n 500 -o '/hpc/group/shindell/ap851/masks/partition_by_pop.nc'

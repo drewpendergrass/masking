@@ -39,7 +39,7 @@ else:
 	parser.add_argument('-latlon_name', '--latlon_name', type=str, default="lat lon", help='If grid supplied is a netcdf file, name of latitude/longitude dimensions respectively, space delimited. Example: "lat lon".')
 	parser.add_argument('-c', '--parallelization_code', type=int, default=None, help='If parallelizing and in step one (generating high-res mask), code for this worker portion of the task. If left as none but parallelizing, assumes we are in step 2')
 	parser.add_argument('-n', '--parallelization_n_tasks', type=int, default=None, help='If parallelizing, number of workers. If a value is supplied here, we assume that parallization is happening.')
-	parser.add_argument('-country', '--country', type=str, default='ABW,AFG,AGO,AIA,ALB,AND,ARE,ARG,ARM,ASM,ATF,ATG,AUS,AUT,AZE,BDI,BEL,BEN,BFA,BGD,BGR,BHR,BHS,BIH,BLM,BLR,BLZ,BMU,BOL,BRA,BRB,BRN,BTN,BWA,CAF,CAN,CHE,CHL,CHN,CIV,CMR,COD,COG,COK,COL,COM,CPV,CRI,CUB,CUW,CYM,CYP,CZE,DEU,DJI,DMA,DNK,DOM,DZA,ECU,EGY,ERI,ESP,EST,ETH,FIN,FJI,FLK,FRO,FSM,GAB,GBR,GEO,GGY,GHA,GIB,GIN,GMB,GNB,GNQ,GRC,GRD,GRL,GTM,GUM,GUY,HKG,HMD,HND,HRV,HTI,HUN,IDN,IMN,IND,IOT,IRL,IRN,IRQ,ISL,ISR,ITA,JAM,JEY,JOR,JPN,KAZ,KEN,KGZ,KHM,KIR,KNA,KOR,KWT,LAO,LBN,LBR,LBY,LCA,LIE,LKA,LSO,LTU,LUX,LVA,MAC,MAF,MAR,MCO,MDA,MDG,MDV,MEX,MHL,MKD,MLI,MLT,MMR,MNE,MNG,MNP,MOZ,MRT,MSR,MUS,MWI,MYS,NAM,NCL,NER,NFK,NGA,NIC,NIU,NLD,NPL,NRU,NZL,OMN,PAK,PAN,PCN,PER,PHL,PLW,PNG,POL,PRI,PRK,PRT,PRY,PSE,PYF,QAT,ROU,RUS,RWA,SAU,SDN,SEN,SGP,SGS,SHN,SLB,SLE,SLV,SMR,SOM,SPM,SRB,SSD,STP,SUR,SVK,SVN,SWE,SWZ,SXM,SYC,SYR,TCA,TCD,TGO,THA,TJK,TKM,TLS,TON,TTO,TUN,TUR,TUV,TZA,UGA,UKR,UMI,URY,USA,UZB,VAT,VCT,VEN,VGB,VIR,VNM,VUT,WLF,WSM,YEM,ZAF,ZMB,ZWE', help='Comma separated three letter ISO codes for countries to make masks of. Each country will be placed in the country dimension')
+	parser.add_argument('-country', '--country', type=str, default='ABW,AFG,AGO,AIA,ALB,AND,ARE,ARG,ARM,ASM,ATF,ATG,AUS,AUT,AZE,BDI,BEL,BEN,BFA,BGD,BGR,BHR,BHS,BIH,BLM,BLR,BLZ,BMU,BOL,BRA,BRB,BRN,BTN,BWA,CAF,CAN,CHE,CHL,CHN,CIV,CMR,COD,COG,COK,COL,COM,CPV,CRI,CUB,CUW,CYM,CYP,CZE,DEU,DJI,DMA,DNK,DOM,DZA,ECU,EGY,ERI,ESP,EST,ETH,FIN,FJI,FLK,FRA,FRO,FSM,GAB,GBR,GEO,GGY,GHA,GIB,GIN,GMB,GNB,GNQ,GRC,GRD,GRL,GTM,GUM,GUY,HKG,HMD,HND,HRV,HTI,HUN,IDN,IMN,IND,IOT,IRL,IRN,IRQ,ISL,ISR,ITA,JAM,JEY,JOR,JPN,KAZ,KEN,KGZ,KHM,KIR,KNA,KOR,KSV,KWT,LAO,LBN,LBR,LBY,LCA,LIE,LKA,LSO,LTU,LUX,LVA,MAC,MAF,MAR,MCO,MDA,MDG,MDV,MEX,MHL,MKD,MLI,MLT,MMR,MNE,MNG,MNP,MOZ,MRT,MSR,MUS,MWI,MYS,NAM,NCL,NER,NFK,NGA,NIC,NIU,NLD,NOR,NPL,NRU,NZL,OMN,PAK,PAN,PCN,PER,PHL,PLW,PNG,POL,PRI,PRK,PRT,PRY,PSE,PYF,QAT,ROU,RUS,RWA,SAU,SDN,SEN,SGP,SGS,SHN,SLB,SLE,SLV,SMR,SOM,SPM,SRB,SSD,STP,SUR,SVK,SVN,SWE,SWZ,SXM,SYC,SYR,TCA,TCD,TGO,THA,TJK,TKM,TLS,TON,TTO,TUN,TUR,TUV,TZA,UGA,UKR,UMI,URY,USA,UZB,VAT,VCT,VEN,VGB,VIR,VNM,VUT,WLF,WSM,YEM,ZAF,ZMB,ZWE', help='Comma separated three letter ISO codes for countries to make masks of. Each country will be placed in the country dimension')
 	parser.add_argument('-o', '--file_out', type=str, help='Where to save mask as netcdf.')
 	args = parser.parse_args()
 	file_out = args.file_out
@@ -71,7 +71,13 @@ countries = countrystring.split(',')
 countrieswcode = {c:i+1 for i,c in enumerate(countries)}
 
 world=gpd.read_file('WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp')
-geoms = {country:world[world['ISO_A3'] == country].geometry for country in countries}
+geoms = {}
+for country in countries:
+	#Norway and France are stored strangely, in WB_A3 column. Kosovo has no official ISO3, but here we take KSV following world bank. New Zealand/Tokelau we use WB_A3 to distinguish
+	if country in ['NOR','FRA','KSV','NZL','TKL']:
+		geoms[country] = world[world['WB_A3'] == country].geometry
+	else:
+		geoms[country] = world[world['ISO_A3'] == country].geometry
 
 try: #if a grid label, this will work.
 	lon,lat = getLonLatFromLabel(gridlabel)
@@ -115,7 +121,7 @@ if do_par and step1:
 	# Reshape to 1D for easier iteration.
 	lon2full = lon2d.reshape(-1)
 	lat2full = lat2d.reshape(-1)
-	# Split to portion of the work assigend.
+	# Split to portion of the work assigned.
 	lon2 = np.array_split(lon2full, parallelization_n_tasks)[parallelization_code]
 	lat2 = np.array_split(lat2full, parallelization_n_tasks)[parallelization_code]
 else:
