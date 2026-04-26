@@ -12,6 +12,9 @@ def getLonLatFromLabel(gridlabel):
 	elif gridlabel == '1x1':
 		lon = np.arange(-179.5,180.0, 1.0)
 		lat = np.arange(-89.5,90, 1.0)
+	elif gridlabel == '0.1x0.1':
+		lon = np.arange(-179.95,180.0, 0.1)
+		lat = np.arange(-89.95,90, 0.1)
 	elif gridlabel == '0.5x0.5':
 		lon = np.arange(-179.75,180.0, 0.5)
 		lat = np.arange(-89.75,90, 0.5)
